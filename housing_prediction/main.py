@@ -37,24 +37,44 @@ def main():
     # plt.figure(figsize=(12,6))
     # sns.heatmap(data.corr(), annot=True, cmap="YlGnBu") # shows correlation between features
     # plt.show()
+
+    print(lr_evaluate(data))
+    print(lr_evaluate(data, True))
+    print(rf_evaluate(data))
+    print(rf_evaluate(data, True))
     
-    # TRAINING
+def lr_evaluate(data, scaled=False):
     X = data.drop(['median_house_value'], axis=1)
     y = data['median_house_value']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-
-    print("Linear Regressor Eval: ", lr_evaluate(X_train, X_test, y_train, y_test))
-    print("Random Forest Regressor Eval: ", rf_evaluate(X_train, X_test, y_train, y_test))
-    
-def lr_evaluate(X_train, X_test, y_train, y_test):
     lr = LinearRegression()
+    
+    if scaled:
+        scaler = StandardScaler()
+        X_train_s = scaler.fit_transform(X_train)
+        X_test_s = scaler.transform(X_test)
+        lr.fit(X_train_s, y_train)
+        return "Linear Regressor scaled eval: " +  str(lr.score(X_test_s, y_test))
+    
     lr.fit(X_train, y_train)
-    return lr.score(X_test, y_test)
+    return "Linear Regressor eval: " + str(lr.score(X_test, y_test))
 
-def rf_evaluate(X_train, X_test, y_train, y_test):
+def rf_evaluate(data, scaled=False):
+    X = data.drop(['median_house_value'], axis=1)
+    y = data['median_house_value']
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    
     rf = RandomForestRegressor()
+    
+    if scaled:
+        scaler = StandardScaler()
+        X_train_s = scaler.fit_transform(X_train)
+        X_test_s = scaler.transform(X_test)
+        rf.fit(X_train_s, y_train)
+        return "Random Forest Regressor scaled eval: " + str(rf.score(X_test_s, y_test))
+    
     rf.fit(X_train, y_train)
-    return rf.score(X_test, y_test)
+    return "Random Forest Regressor eval: " + str(rf.score(X_test, y_test))
     
     
 if __name__ == "__main__":
