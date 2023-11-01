@@ -6,6 +6,7 @@ import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestRegressor
 
 def main():
     # DATA READING
@@ -38,19 +39,22 @@ def main():
     # plt.show()
     
     # TRAINING
-    scaler = StandardScaler()
     X = data.drop(['median_house_value'], axis=1)
     y = data['median_house_value']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-    X_train_s = scaler.fit_transform(X_train)
-    X_test_s = scaler.fit_transform(X_test)
+
+    print("Linear Regressor Eval: ", lr_evaluate(X_train, X_test, y_train, y_test))
+    print("Random Forest Regressor Eval: ", rf_evaluate(X_train, X_test, y_train, y_test))
     
-    reg = LinearRegression()
-    reg.fit(X_train_s, y_train)
-    
-    # EVALUATION
-    print(reg.score(X_test_s, y_test))
-    
+def lr_evaluate(X_train, X_test, y_train, y_test):
+    lr = LinearRegression()
+    lr.fit(X_train, y_train)
+    return lr.score(X_test, y_test)
+
+def rf_evaluate(X_train, X_test, y_train, y_test):
+    rf = RandomForestRegressor()
+    rf.fit(X_train, y_train)
+    return rf.score(X_test, y_test)
     
     
 if __name__ == "__main__":
